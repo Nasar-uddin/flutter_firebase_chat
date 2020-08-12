@@ -1,8 +1,8 @@
 import 'package:fire_chat/constants.dart';
 import 'package:fire_chat/screens/chat_screen.dart';
+import 'package:fire_chat/services/auth.dart';
 import 'package:fire_chat/widgets/rounded_button.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = 'login_screen';
@@ -13,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String email;
   String password;
+  final AuthServices _auth = AuthServices();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,15 +59,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.blue[300],
                   text: 'Login',
                   onPressed: () async {
-                    final _auth = FirebaseAuth.instance;
-                    try{
-                      final user = await _auth.signInWithEmailAndPassword(email: email, password: password);
-                      if(user!=null){
-                         Navigator.pushNamed(context, ChatScreen.routeName);
-                      }
-                    }catch(e){
-                      print('Error');
-                      print(e.toString());
+                    var user = await _auth.logIn(email, password);
+                    if(user==null){
+                      print('Error login');
+                    }else{
+                      Navigator.pushReplacementNamed(context, ChatScreen.routeName);
                     }
                 }),
               ),
