@@ -1,4 +1,5 @@
 import 'package:fire_chat/constants.dart';
+import 'package:fire_chat/screens/chat_screen.dart';
 import 'package:fire_chat/services/auth.dart';
 import 'package:fire_chat/widgets/rounded_button.dart';
 import 'package:flutter/material.dart';
@@ -71,12 +72,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       print('Error');
                       print(e.toString());
                     }*/
-                    dynamic user = _auth.signInAnno();
+                    dynamic user = _auth.signInWithEmailPass(email, password);
                     if(user==null){
                       print('Error login');
                     }else{
                       print('loged in');
                       print(user);
+                      Navigator.pushReplacementNamed(context, ChatScreen.routeName);
                     }
 
                     // print('$email $password');

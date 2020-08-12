@@ -1,3 +1,4 @@
+import 'package:fire_chat/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fire_chat/constants.dart';
 
@@ -8,6 +9,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final _loggedInUser = AuthServices().getCurrentUser();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
