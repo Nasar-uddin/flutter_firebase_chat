@@ -46,9 +46,11 @@ class AuthServices {
   getCurrentUser() async {
     try {
       var user = await _auth.currentUser();
-      print(user.email);
+      return user;
+      // print(user.email);
     } catch (e) {
       print(e.toString());
+      return null;
     }
   }
 }
