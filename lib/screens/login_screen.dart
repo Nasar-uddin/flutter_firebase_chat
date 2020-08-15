@@ -68,11 +68,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           spin = true;
                         });
                         var user = await _auth.logIn(email, password);
+                        print(user);
                         if (user == null) {
                           print('Error login');
-                          spin = false;
+                          setState(() {
+                          spin = !true;
+                        });
                         } else {
-                          spin = false;
+                          setState(() {
+                          spin = !true;
+                        });
                           Navigator.pushReplacementNamed(
                               context, ChatScreen.routeName);
                         }
