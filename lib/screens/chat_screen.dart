@@ -1,4 +1,5 @@
 import 'package:fire_chat/services/auth.dart';
+import 'package:fire_chat/widgets/messages_stream.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fire_chat/constants.dart';
@@ -16,27 +17,33 @@ class _ChatScreenState extends State<ChatScreen> {
   String messageText;
   FirebaseUser logedInUser;
   final String collectionName = 'messages';
+  final messageController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
     // getMessages();
-    messageStream();
+    // messageStream();
   }
+
   void getCurrentUser() async {
     logedInUser = await _auth.getCurrentUser();
     print(logedInUser.email);
   }
+
   void getMessages() async {
     final messages = await _firestore.collection(collectionName).getDocuments();
-    for(var message in messages.documents){
+    for (var message in messages.documents) {
       print(message.data);
     }
   }
+
   void messageStream() async {
-    await for(var snapshot in _firestore.collection(collectionName).snapshots()){
-      for(var messages in snapshot.documents){
-        print(messages.data);
+    await for (var snapshot
+        in _firestore.collection(collectionName).snapshots()) {
+      for (var messages in snapshot.documents) {
+        // print(messages.data);
       }
     }
   }
@@ -44,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[100],
+      backgroundColor: Colors.grey[700],
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
@@ -63,29 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore.collection(collectionName).snapshots(),
-              builder: (context, snapshot){
-                if(!snapshot.hasData){
-                  return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.blueAccent,
-                    ),
-                  );
-                }
-                final messages = snapshot.data.documents;
-                List<Text> messageWidget = [];
-                for(var message in messages){
-                  final messageText = message.data['text'];
-                  final messageSender = message.data['sender'];
-                  final Text text = Text('$messageText from $messageSender');
-                  messageWidget.add(text);
-                }
-                return Column(
-                  children: messageWidget,
-                );
-              },
-            ),
+            MessagesStream(firestore: _firestore, collectionName: collectionName),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -93,6 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      controller: messageController,
                       onChanged: (value) {
                         //Do something with the user input.
                         messageText = value;
@@ -103,10 +89,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   FlatButton(
                     onPressed: () {
                       //Implement send functionality.
-                      _firestore.collection(collectionName).add({
-                        'text':messageText,
-                        'sender':logedInUser.email
-                      });
+                      messageController.clear();
+                      _firestore.collection(collectionName).add(
+                          {'text': messageText, 'sender': logedInUser.email});
                     },
                     child: Text(
                       'Send',
@@ -122,3 +107,5 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
+
+
